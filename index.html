@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meta P&D 2026 · Binário Cloud</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%2322d3ee'/%3E%3Cpath d='M6 15c0-3 2.5-5.5 6-5.5s6 2.5 6 5.5' stroke='%230b0f14' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='9' r='1.6' fill='%230b0f14'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#080b10; --bg2:#0f1520; --panel:#141c29; --panel-hi:#1b2534; --border:#2a374a; --border-hi:#3c4f68;
+    --text:#f3f6fa; --text-dim:#c3cee0; --text-mute:#8a9ab0;
+    --cyan:#2dd9f5; --cyan-dim:#0d3d49;
+    --green:#4ade9c; --green-dim:#123527;
+    --blue:#4cc3fb; --blue-dim:#10324a;
+    --amber:#ffc65c; --amber-dim:#3a2907;
+    --violet:#b79bfb; --violet-dim:#2a2148;
+    --slate:#8695a8; --slate-dim:#212c3b;
+    --red:#ff8585;
+    --mono:'JetBrains Mono',monospace; --disp:'Space Grotesk',sans-serif; --body:'Inter',sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth; color-scheme:dark;}
+  html, body{background:#0a0e14 !important;}
+  html,body{overflow-x:hidden; max-width:100%;}
+  body{
+    margin:0;
+    background-color:#0a0e14 !important;
+    background-image:
+      radial-gradient(1100px 600px at 85% -10%, #0e2733 0%, transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, #171029 0%, transparent 55%);
+    background-repeat:no-repeat;
+    min-height:100vh;
+    color:var(--text); font-family:var(--body); -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--cyan); color:#03181c;}
+
+  /* Topbar */
+  .topbar{
+    position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between;
+    padding:14px 28px; background:rgba(10,14,20,.82); backdrop-filter:blur(10px); border-bottom:1px solid var(--border);
+  }
+  .tb-left{display:flex; align-items:center; gap:10px;}
+  .tb-mark{width:26px; height:26px; border-radius:7px; background:linear-gradient(135deg,var(--cyan),#0891b2); display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-weight:700; color:#03181c; font-size:13px;}
+  .tb-title{font-family:var(--mono); font-size:13px; color:var(--text-dim); letter-spacing:.03em;}
+  .tb-title b{color:var(--text); font-weight:600;}
+  .tb-right{display:flex; align-items:center; gap:18px; font-family:var(--mono); font-size:12px; color:var(--text-mute);}
+  .tb-live{display:flex; align-items:center; gap:6px;}
+  .dot-live{width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 0 3px var(--green-dim); animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+
+  /* Hero */
+  .hero{padding:64px 28px 40px; max-width:1180px; margin:0 auto;}
+  .hero-eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--cyan); margin-bottom:14px; display:flex; align-items:center; gap:10px;}
+  .hero-eyebrow::before{content:''; width:22px; height:1px; background:var(--cyan);}
+  .hero-grid{display:grid; grid-template-columns:1.3fr .8fr; gap:40px; align-items:end;}
+  .hero-title{font-family:var(--disp); font-weight:600; font-size:clamp(30px,4.2vw,50px); line-height:1.08; margin:0 0 16px; letter-spacing:-.01em;}
+  .hero-title span{color:var(--cyan);}
+  .hero-sub{color:var(--text-dim); font-size:15px; line-height:1.6; max-width:52ch; margin:0;}
+
+  .ring-card{
+    background:linear-gradient(180deg,var(--panel-hi),var(--panel)); border:1px solid var(--border-hi); border-radius:18px;
+    padding:22px; display:flex; align-items:center; gap:20px;
+  }
+  .ring-wrap{position:relative; width:112px; height:112px; flex:none;}
+  .ring-wrap svg{transform:rotate(-90deg);}
+  .ring-bg{fill:none; stroke:var(--border); stroke-width:9;}
+  .ring-fg{fill:none; stroke:var(--cyan); stroke-width:9; stroke-linecap:round; transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1);}
+  .ring-num{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column;}
+  .ring-num b{font-family:var(--disp); font-size:26px; font-weight:700;}
+  .ring-num small{font-family:var(--mono); font-size:9px; color:var(--text-mute); text-transform:uppercase; letter-spacing:.08em;}
+  .ring-legend{display:flex; flex-direction:column; gap:7px; font-family:var(--mono); font-size:12px;}
+  .ring-legend .li{display:flex; align-items:center; gap:8px; color:var(--text-dim);}
+  .ring-legend .sw{width:8px; height:8px; border-radius:2px; flex:none;}
+  .ring-legend b{color:var(--text); font-weight:600;}
+
+  /* KPI strip */
+  .kpis{max-width:1180px; margin:0 auto; padding:0 28px 36px; display:grid; grid-template-columns:repeat(5,1fr); gap:12px;}
+  .kpi{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px 18px;}
+  .kpi .k-num{font-family:var(--disp); font-size:26px; font-weight:700;}
+  .kpi .k-label{font-family:var(--mono); font-size:10.5px; color:var(--text-mute); text-transform:uppercase; letter-spacing:.06em; margin-top:2px;}
+  .kpi.c-shipped .k-num{color:var(--green);}
+  .kpi.c-progress .k-num{color:var(--blue);}
+  .kpi.c-planning .k-num{color:var(--violet);}
+  .kpi.c-backlog .k-num{color:var(--slate);}
+
+  /* Controls */
+  .controls{max-width:1180px; margin:0 auto; padding:0 28px 20px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;}
+  .search{position:relative; flex:1; min-width:220px; max-width:340px;}
+  .search input{
+    width:100%; background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:10px 12px 10px 34px;
+    color:var(--text); font-family:var(--body); font-size:13.5px; outline:none; transition:border-color .15s;
+    -webkit-appearance:none; appearance:none; -webkit-text-fill-color:var(--text); caret-color:var(--cyan);
+  }
+  .search input::placeholder{color:var(--text-mute); opacity:1;}
+  .search input:-webkit-autofill{
+    -webkit-box-shadow:0 0 0 1000px var(--panel) inset; -webkit-text-fill-color:var(--text);
+  }
+  .search input:focus{border-color:var(--cyan);}
+  .search svg{position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--text-mute);}
+  .chips{display:flex; flex-wrap:wrap; gap:8px;}
+  .chip{
+    font-family:var(--mono); font-size:11px; padding:6px 12px; border-radius:999px; border:1px solid var(--border);
+    background:var(--panel); color:var(--text-dim); cursor:pointer; user-select:none; transition:.15s;
+  }
+  .chip:hover{border-color:var(--border-hi); color:var(--text);}
+  .chip.active{background:var(--cyan); border-color:var(--cyan); color:#03181c; font-weight:600;}
+
+  /* Metas list */
+  .metas{max-width:1180px; margin:0 auto; padding:0 28px 60px; display:flex; flex-direction:column; gap:14px;}
+  .meta-card{background:var(--panel); border:1px solid var(--border); border-radius:16px; overflow:hidden; transition:border-color .15s;}
+  .meta-card:hover{border-color:var(--border-hi);}
+  .meta-head{display:grid; grid-template-columns:56px 1fr auto 190px 30px; align-items:center; gap:16px; padding:16px 18px; cursor:pointer;}
+  .meta-num{font-family:var(--mono); font-size:11px; color:var(--text-mute);}
+  .meta-num b{display:block; font-family:var(--disp); font-size:20px; color:var(--cyan); font-weight:700;}
+  .meta-name{min-width:0;}
+  .meta-name .n1{font-family:var(--disp); font-weight:600; font-size:15.5px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .meta-name .n2{font-family:var(--mono); font-size:11px; color:var(--text-mute); margin-top:3px; display:flex; gap:6px; flex-wrap:wrap;}
+  .tag{padding:2px 7px; border-radius:5px; font-size:9.5px; text-transform:uppercase; letter-spacing:.03em; background:var(--panel-hi); border:1px solid var(--border-hi); color:var(--text-dim);}
+  .badge{font-family:var(--mono); font-size:10.5px; font-weight:600; padding:5px 10px; border-radius:7px; white-space:nowrap; text-transform:uppercase; letter-spacing:.02em; text-align:center;}
+  .b-shipped{color:var(--green); background:var(--green-dim); border:1px solid #14523f;}
+  .b-progress{color:var(--blue); background:var(--blue-dim); border:1px solid #0f4560;}
+  .b-review, .b-test{color:var(--violet); background:var(--violet-dim); border:1px solid #3d2f66;}
+  .b-planning{color:var(--amber); background:var(--amber-dim); border:1px solid #5c4110;}
+  .b-backlog{color:var(--slate); background:var(--slate-dim); border:1px solid #2a3444;}
+
+  .meta-bar{display:flex; align-items:center; gap:10px;}
+  .bar-track{flex:1; height:6px; border-radius:99px; background:var(--border); overflow:hidden;}
+  .bar-fill{height:100%; border-radius:99px; background:linear-gradient(90deg,var(--cyan),var(--green));}
+  .bar-pct{font-family:var(--mono); font-size:11.5px; color:var(--text-dim); width:36px; text-align:right;}
+
+  .chev{color:var(--text-mute); transition:transform .2s;}
+  .meta-card.open .chev{transform:rotate(180deg);}
+
+  .meta-body{max-height:0; overflow:hidden; transition:max-height .3s ease;}
+  .meta-body-in{padding:0 18px 20px; border-top:1px solid var(--border);}
+  .meta-detail{
+    font-family:var(--mono); font-size:12px; color:var(--text-dim); line-height:1.7; background:var(--bg2);
+    border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin:16px 0; white-space:pre-wrap;
+  }
+  .meta-detail b{color:var(--cyan);}
+  .meta-toggle-detail{
+    font-family:var(--mono); font-size:10.5px; color:var(--text-mute); cursor:pointer; margin-top:14px; display:inline-flex;
+    align-items:center; gap:5px; text-transform:uppercase; letter-spacing:.05em;
+  }
+  .meta-toggle-detail:hover{color:var(--cyan);}
+
+  .fases-label{font-family:var(--mono); font-size:10.5px; color:var(--text-mute); text-transform:uppercase; letter-spacing:.07em; margin:16px 0 8px;}
+  .fase-row{display:grid; grid-template-columns:26px 1fr auto 150px auto; align-items:center; gap:12px; padding:10px 12px; border-radius:10px; background:var(--bg2); border:1px solid var(--border); margin-bottom:7px;}
+  .fase-row:hover{border-color:var(--border-hi);}
+  .fase-idx{font-family:var(--mono); font-size:10px; color:var(--text-mute);}
+  .fase-name{font-size:13px; color:var(--text);}
+  .fase-name small{display:block; font-family:var(--mono); font-size:10.5px; color:var(--text-mute); margin-top:2px;}
+  .fase-assignee{font-family:var(--mono); font-size:11px; color:var(--text-mute); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .fase-link{color:var(--text-mute); display:flex;}
+  .fase-link:hover{color:var(--cyan);}
+
+  .crit-section{max-width:1180px; margin:0 auto; padding:0 28px 70px;}
+  .crit-title{font-family:var(--disp); font-size:20px; font-weight:600; margin:0 0 6px;}
+  .crit-sub{font-family:var(--mono); font-size:12px; color:var(--text-mute); margin:0 0 20px;}
+  .crit-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  .crit-card{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:18px 20px;}
+  .crit-card h4{font-family:var(--disp); font-size:14.5px; margin:0 0 12px; display:flex; align-items:center; gap:8px;}
+  .crit-card h4 .sw{width:8px; height:8px; border-radius:2px;}
+  .crit-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:9px;}
+  .crit-list li{display:flex; align-items:flex-start; gap:9px; font-size:12.5px; color:var(--text-dim); line-height:1.5;}
+  .crit-list li .cb{width:14px; height:14px; border-radius:4px; border:1.5px solid var(--slate); flex:none; margin-top:2px;}
+
+  footer{max-width:1180px; margin:0 auto; padding:24px 28px 50px; border-top:1px solid var(--border); font-family:var(--mono); font-size:11px; color:var(--text-mute); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;}
+  footer a{color:var(--text-mute);}
+
+  @media (max-width:900px){
+    .hero{padding:48px 20px 28px;}
+    .hero-grid{grid-template-columns:1fr; gap:26px;}
+    .ring-card{padding:18px;}
+    .kpis{grid-template-columns:repeat(2,1fr); padding:0 20px 28px;}
+    .controls{padding:0 20px 16px;}
+    .crit-section{padding:0 20px 50px;}
+    .metas{padding:0 20px 50px;}
+  }
+
+  @media (max-width:640px){
+    .topbar{padding:12px 16px;}
+    .tb-title{font-size:11.5px;}
+    .tb-right{gap:10px; font-size:10.5px;}
+    .tb-right #tb-date{display:none;}
+
+    .hero{padding:36px 16px 24px;}
+    .hero-eyebrow{font-size:10.5px; margin-bottom:10px;}
+    .hero-sub{font-size:13.5px;}
+    .ring-card{flex-direction:column; align-items:flex-start; gap:16px;}
+    .ring-wrap{width:96px; height:96px;}
+    .ring-wrap svg{width:96px; height:96px;}
+
+    .kpis{grid-template-columns:repeat(2,1fr); gap:10px; padding:0 16px 24px;}
+    .kpi{padding:12px 14px;}
+    .kpi .k-num{font-size:21px;}
+
+    .controls{flex-direction:column; align-items:stretch; padding:0 16px 16px; gap:12px;}
+    .search{max-width:none;}
+    .chips{gap:6px;}
+    .chip{font-size:10.5px; padding:7px 11px;}
+
+    .metas{padding:0 16px 50px; gap:10px;}
+    .meta-card{border-radius:14px;}
+    .meta-head{
+      grid-template-columns:1fr auto; column-gap:10px; row-gap:8px; padding:14px;
+    }
+    .meta-num{grid-column:1; order:1;}
+    .meta-name{grid-column:1/-1; order:2;}
+    .meta-head > .badge{order:3; justify-self:start;}
+    .meta-bar{grid-column:1/-1; order:4;}
+    .chev{order:3; justify-self:end; align-self:start;}
+    .meta-name .n1{white-space:normal; font-size:14.5px;}
+
+    .meta-body-in{padding:0 14px 16px;}
+    .fases-label{font-size:10px; line-height:1.5;}
+    .fase-row{
+      grid-template-columns:1fr auto; row-gap:6px; padding:11px;
+    }
+    .fase-idx{display:none;}
+    .fase-name{grid-column:1/-1; order:1;}
+    .fase-assignee{order:2; font-size:10.5px;}
+    .fase-row .badge{order:3;}
+    .fase-link{order:4; justify-self:end;}
+
+    .crit-section{padding:0 16px 50px;}
+    .crit-title{font-size:17px;}
+    .crit-grid{grid-template-columns:1fr; gap:10px;}
+    .crit-card{padding:15px 16px;}
+
+    footer{padding:20px 16px 40px; flex-direction:column;}
+  }
+</style>
+</head>
+<body style="background:#0a0e14; margin:0;">
+
+<div class="topbar">
+  <div class="tb-left">
+    <div class="tb-mark">BC</div>
+    <span class="tb-title"><b>Meta P&D 2026</b> · Binário Cloud</span>
+  </div>
+  <div class="tb-right">
+    <div class="tb-live"><span class="dot-live"></span> Sincronizado com ClickUp</div>
+    <span id="tb-date"></span>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-eyebrow">Painel de acompanhamento · P&D</div>
+  <div class="hero-grid">
+    <div>
+      <h1 class="hero-title">Metas de Pesquisa &<br><span>Desenvolvimento</span> 2026</h1>
+      <p class="hero-sub">Visão consolidada das 11 metas estratégicas do time de Engenharia/Plataforma da Binário Cloud — infraestrutura, produto e eficiência operacional — com o progresso real de cada fase, extraído diretamente da lista <b style="color:var(--text)">Meta P&D 2026</b> no ClickUp.</p>
+    </div>
+    <div class="ring-card">
+      <div class="ring-wrap">
+        <svg width="112" height="112" viewBox="0 0 112 112">
+          <circle class="ring-bg" cx="56" cy="56" r="48"></circle>
+          <circle class="ring-fg" id="ringFg" cx="56" cy="56" r="48" stroke-dasharray="301.6" stroke-dashoffset="301.6"></circle>
+        </svg>
+        <div class="ring-num"><b id="ringPct">0%</b><small>concluído</small></div>
+      </div>
+      <div class="ring-legend" id="ringLegend"></div>
+    </div>
+  </div>
+</div>
+
+<div class="kpis" id="kpiStrip"></div>
+
+<div class="controls">
+  <div class="search">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input id="searchInput" placeholder="Buscar meta ou fase…">
+  </div>
+  <div class="chips" id="statusChips"></div>
+</div>
+
+<div class="metas" id="metasList"></div>
+
+<div class="crit-section">
+  <h3 class="crit-title">Critérios de sucesso adicionais</h3>
+  <p class="crit-sub">Itens do backlog geral sem fases detalhadas — critérios de aceite do trimestre.</p>
+  <div class="crit-grid" id="critGrid"></div>
+</div>
+
+<footer>
+  <span>Fonte: ClickUp · Lista <a href="https://app.clickup.com/3080406/v/l/6-901323683841-1" target="_blank">Meta P&D 2026</a></span>
+  <span id="tb-gen"></span>
+</footer>
+
+<script>
+const STATUS_META = {
+  'shipped':   {label:'Concluído',   cls:'b-shipped',  color:'var(--green)'},
+  'in progress':{label:'Em andamento',cls:'b-progress', color:'var(--blue)'},
+  'in review': {label:'Em revisão',  cls:'b-review',   color:'var(--violet)'},
+  'in test':   {label:'Em teste',    cls:'b-test',     color:'var(--violet)'},
+  'in planning':{label:'Planejamento',cls:'b-planning', color:'var(--amber)'},
+  'backlog':   {label:'Não iniciado',cls:'b-backlog',  color:'var(--slate)'}
+};
+const STATUS_WEIGHT = {'shipped':1,'in progress':.5,'in review':.5,'in test':.5,'in planning':.5,'backlog':0};
+
+function fmtDate(ms){
+  if(!ms) return '—';
+  const d = new Date(Number(ms));
+  return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+}
+
+const metas = [
+{num:1, id:'86afcpbtq', status:'in progress', due:1798700400000,
+ name:'Disponibilidade e expansão da infraestrutura cloud', short:'Disponibilidade Ambiente — Nuvem',
+ assignee:'Leonardo Gomes', tags:['garantia sla','eficiência operacional'],
+ detail:'Objetivo: Aumentar resiliência, visibilidade e capacidade da infraestrutura de nuvem.\nResponsável: Leonardo Gomes · Gerência de Engenharia\nMeta: garantir disponibilidade 99,982% (BCP | DataCenter)\nEntregáveis: plano trimestral de expansão, melhorias de resiliência, dashboards operacionais, plano de backup revisado, atualizações críticas aplicadas.\nCritério de aceite: plano executado, evidências registradas e indicadores publicados.\nRisco principal: conflito com demandas paralelas de migração e operação.',
+ fases:[
+  {n:'FASE01 — Organização ambientes', status:'shipped', assignee:'Leonardo Gomes', due:1775199600000, sub:3, id:'86ag5vr5b'},
+  {n:'FASE02 — Melhoria da Resiliência', status:'in progress', assignee:'Leonardo Gomes', due:null, sub:5, id:'86ag5vtnu'},
+  {n:'FASE03 — Soluções de Apoio', status:'backlog', assignee:'Leonardo Gomes', due:null, sub:3, id:'86ag5vw3d'},
+  {n:'FASE04 — Capacidade dentro do BCP', status:'backlog', assignee:'Leonardo Gomes', due:null, sub:5, id:'86afcr3n8'}
+ ]},
+{num:2, id:'86afcpf3x', status:'in progress', due:1782802800000,
+ name:'Observabilidade da nuvem e undercloud', short:'Observabilidade de BCloud 3.0',
+ assignee:'Luiz Fernando Justino Silva', tags:['eficiência operacional','garantia sla'],
+ detail:'Objetivo: Aumentar capacidade de diagnóstico, prevenção e análise da plataforma.\nResponsável: Coordenador de SRE e Confiabilidade\nEntregáveis: arquitetura Prometheus/Grafana implantada, dashboards técnicos e executivos, alertas críticos configurados, plano de evolução para undercloud.\nCritério de aceite: dashboards e alertas operando em produção com documentação mínima.\nRisco principal: escopo amplo demais sem priorização inicial.',
+ fases:[
+  {n:'FASE01 — Arquitetura do Prometheus', status:'in progress', assignee:'Luiz Fernando', due:null, sub:4, id:'86ag1n72m'},
+  {n:'FASE02 — Arquitetura do Grafana', status:'backlog', assignee:'Luiz Fernando', due:null, sub:2, id:'86ag1n78c'},
+  {n:'FASE03 — Plano de backup da VM', status:'backlog', assignee:'Luiz Fernando', due:null, sub:1, id:'86ag1n7f6'}
+ ]},
+{num:3, id:'86afcpfq1', status:'in planning', due:1785481200000,
+ name:'Automação do atendimento Cláudia (N1)', short:'ClaudIA no Suporte',
+ assignee:'Guilherme Lopes', tags:['modernização tecnológica','eficiência operacional'],
+ detail:'Objetivo: Garantir 80% dos chamados N1 tratados via ClaudIA, reduzindo carga manual de atendimento até julho.\nEntregáveis: fluxo principal automatizado, base de conhecimento conectada, homologação funcional, relatório de impacto operacional.\nCritério de aceite: solução em uso com resultado mensurável de eficiência.\nRisco principal: baixa qualidade da base de conhecimento ou escopo difuso.',
+ fases:[
+  {n:'FASE01 — Trigger de criação de chamado no znuny', status:'backlog', assignee:'—', due:null, sub:0, id:'86ag1ncz9'},
+  {n:'FASE02 — API de integração entre znuny e ClaudIA', status:'backlog', assignee:'—', due:null, sub:0, id:'86ag1ndmu'}
+ ]},
+{num:4, id:'86afcpgzp', status:'in progress', due:1796022000000,
+ name:'Migração Ceph (EC → Réplica) e descomissionamento do legado', short:'Migração Ceph',
+ assignee:'Leonardo Gomes', tags:['eficiência operacional','garantia sla','sustentando o crescimento do negócio','higiene de infraestrutura'],
+ detail:'Objetivo: Encerrar dependência do ambiente legado com segurança operacional, consolidando o backup em arquitetura Ceph Replica.\nEntregáveis: validação dos discos, migração das réplicas EC → Replica, validação de integridade pós-migração, plano de rollback, descomissionamento do legado.\nCritério de aceite: legado descomissionado e operação validada.\nRisco principal: atraso de insumo físico ou falha na validação pós-migração.',
+ fases:[
+  {n:'FASE01 — Planejamento', status:'shipped', assignee:'Leonardo Gomes', due:1770361200000, sub:2, id:'86ag5vn7n'},
+  {n:'FASE02 — Ajustes do Ambiente', status:'shipped', assignee:'Leonardo Gomes', due:1789110000000, sub:3, id:'86ag5vnj3'},
+  {n:'FASE03 — Migração dos backups', status:'in progress', assignee:'Leonardo Gomes', due:1788937200000, sub:3, id:'86ag5vnnu'},
+  {n:'FASE04 — Descomissionamento ambiente antigo', status:'backlog', assignee:'Leonardo Gomes', due:1790751600000, sub:2, id:'86ag5vp15'}
+ ]},
+{num:5, id:'86afcpfhb', status:'in progress', due:1782802800000,
+ name:'Migração Cloud 2 para Cloud 3', short:'Migração 2.0 > 3.0',
+ assignee:'Leonardo Gomes', tags:['eficiência operacional','sustentando o crescimento do negócio','modernização tecnológica','higiene de infraestrutura'],
+ detail:'Meta: ≤100 VMs na Cloud 2.0.\nObjetivo: Transferir workloads e infraestrutura para a nova cloud com previsibilidade e segurança.\nEntregáveis: cronograma consolidado, migração dos nós físicos, migração dos IPs, migração das VMs, validação final.\nCritério de aceite: migração concluída com validação operacional.\nRisco principal: responsabilidade compartilhada sem dono executivo claro.',
+ fases:[
+  {n:'FASE01 — Quantidade de VMs cloud 2.0 (evolução)', status:'shipped', assignee:'Leonardo Gomes', due:1782802800000, sub:5, id:'86afcx00k'},
+  {n:'FASE02 — Migração de Nodes', status:'in progress', assignee:'Leonardo Gomes', due:1798700400000, sub:34, id:'86afzddfh'},
+  {n:'FASE03 — Migração de Bloco de IPs', status:'backlog', assignee:'Leonardo Gomes', due:1798700400000, sub:5, id:'86afzde05'}
+ ]},
+{num:6, id:'86afcpha5', status:'in progress', due:1780210800000,
+ name:'Validação e entrada da solução de backup (BC-Backup) em produção', short:'Nova solução de Backup — BC-Backup',
+ assignee:'Nathan de Moraes Valim Francisco', tags:['evolução da plataforma de nuvem','modernização tecnológica'],
+ detail:'Objetivo: concluir avaliação da solução Storware + BCOS e preparar pilotos com clientes, substituindo o Veeam.\nEntregáveis: testes de QA/backup/restore, tutoriais técnicos, 5 clientes piloto definidos, relatório técnico de validação, decisão formal sobre produção/licenciamento.\nCritério de aceite: solução validada e próxima etapa aprovada.\nRisco principal: avançar para produção sem comparação estratégica adequada (matriz: aderência técnica, open source, white label, custo, lock-in, esforço operacional).',
+ fases:[
+  {n:'FASE01 — Instalar Ambiente Produtivo', status:'shipped', assignee:'Nathan', due:null, sub:6, id:'86afcrut0'},
+  {n:'FASE02 — Ajustar frontend BCOS', status:'shipped', assignee:'Nathan', due:null, sub:3, id:'86afjfc80'},
+  {n:'FASE03 — Esteira QA', status:'in progress', assignee:'Nathan', due:null, sub:8, id:'86ag5ua03'}
+ ]},
+{num:7, id:'86afcphgx', status:'in progress', due:1782802800000,
+ name:'Automação da instalação do BC Box', short:'BC Box — Automação de instalação do BCP',
+ assignee:'Nathan de Moraes Valim Francisco', tags:['sustentando o crescimento do negócio','eficiência operacional'],
+ detail:'Objetivo: reduzir esforço manual e tempo de implantação do BC Box, a partir dos testes realizados na UOL.\nEntregáveis: testes UOL registrados, escopo de automação definido, automação dos componentes prioritários, documentação, comparação antes/depois do tempo de implantação.\nCritério de aceite: instalação automatizada com evidência de ganho operacional.\nRisco principal: ausência de documentação suficiente da etapa de teste.',
+ fases:[
+  {n:'FASE01 — Teste do Beta na UOL', status:'shipped', assignee:'Nathan', due:1773990000000, sub:7, id:'86ag1nr2u'},
+  {n:'FASE02 — Melhorias coletadas no Projeto UOL', status:'shipped', assignee:'Vitor Ribeiro', due:1776409200000, sub:6, id:'86ag1nrvz'},
+  {n:'FASE03 — Instalar o CEPH', status:'in test', assignee:'Vitor Ribeiro', due:1782802800000, sub:4, id:'86ag1ntg8'},
+  {n:'FASE04 — Instalar Storware', status:'in progress', assignee:'Vitor Ribeiro', due:1782802800000, sub:6, id:'86ag1nu17'},
+  {n:'FASE05 — Instalação do Sistema de Observabilidade', status:'in progress', assignee:'Vitor Ribeiro', due:1782802800000, sub:0, id:'86ag1nup2'},
+  {n:'FASE06 — Melhorias skyline (fora da meta BC-Box)', status:'backlog', assignee:'Vitor Ribeiro', due:null, sub:1, id:'86ag1nvn5'}
+ ]},
+{num:8, id:'86afcphpj', status:'in progress', due:1777532400000,
+ name:'Segurança e evolução do BCP', short:'BCP — Segurança',
+ assignee:'Guilherme Lopes', tags:['evolução da plataforma de nuvem','eficiência operacional'],
+ detail:'Objetivo: aumentar segurança e confiabilidade do acesso à plataforma (calculadora e Console) com MFA e validação reforçada.\nEntregáveis: MFA implementado, validação por token, nova tela de validação de acesso, testes de uso e segurança.\nCritério de aceite: funcionalidade disponível, validada e documentada.\nRisco principal: competição com outras entregas de produto.',
+ fases:[
+  {n:'FASE01 — Validação de sessão', status:'shipped', assignee:'Guilherme Lopes', due:null, sub:2, id:'86ag1nywn'},
+  {n:'FASE02 — Canal de geração de links para clientes', status:'shipped', assignee:'Guilherme Lopes', due:null, sub:2, id:'86ag1nywb'},
+  {n:'FASE03 — Identificador de acesso (Central/Console)', status:'shipped', assignee:'Guilherme Lopes', due:null, sub:2, id:'86ag1nywv'},
+  {n:'FASE04 — Redirecionamento sem sessão válida', status:'shipped', assignee:'Guilherme Lopes', due:null, sub:2, id:'86ag1nyx6'},
+  {n:'FASE05 — Habilitar MFA no BCP', status:'shipped', assignee:'Guilherme Lopes', due:null, sub:3, id:'86ag1nyxf'},
+  {n:'FASE06 — Esteira QA', status:'backlog', assignee:'Guilherme Lopes', due:null, sub:7, id:'86ag4t18m'}
+ ]},
+{num:9, id:'86afcphue', status:'in progress', due:1788159600000,
+ name:'Módulo Financeiro do BCP', short:'BCP — Módulo Financeiro',
+ assignee:'Guilherme Lopes', tags:['evolução da plataforma de nuvem'],
+ detail:'Objetivo: disponibilizar visibilidade de precificação no fluxo de criação de VMs, com custos em tempo real.\nEntregáveis: integração da precificação, exibição de custos em tempo real, testes funcionais, validação com stakeholders.\nCritério de aceite: módulo funcionando conforme cenário definido.\nRisco principal: inconsistência entre cálculo e exibição.',
+ fases:[
+  {n:'FASE01 — Extrato de Consumo em tempo real', status:'shipped', assignee:'Guilherme Lopes', due:null, sub:5, id:'86afct8bu'},
+  {n:'FASE02 — Precificação na criação de VM', status:'shipped', assignee:'Guilherme Lopes', due:null, sub:4, id:'86afct7za'},
+  {n:'FASE03 — Rateio de Notas Fiscais', status:'shipped', assignee:'Guilherme Lopes', due:null, sub:6, id:'86afct8e7'},
+  {n:'FASE04 — Faturamento PAAS | SAAS', status:'in planning', assignee:'Guilherme Lopes', due:null, sub:9, id:'86afct8jh'},
+  {n:'FASE05 — Esteira QA', status:'backlog', assignee:'Guilherme Lopes', due:null, sub:10, id:'86ag5uhzf'}
+ ]},
+{num:10, id:'86afctd22', status:'in progress', due:1788159600000,
+ name:'BCOS / Observabilidade como módulo do BCP', short:'BCP — Módulo Observabilidade',
+ assignee:'Nathan de Moraes Valim Francisco', tags:['evolução da plataforma de nuvem','eficiência operacional'],
+ detail:'Objetivo: evoluir o BCP com um módulo próprio de observabilidade (capacidade e alertas).\nEntregáveis: painel inicial do módulo, visão de capacidade, alertas priorizados, escopo funcional documentado.\nCritério de aceite: painel e visão mínima publicados para validação.\nRisco principal: tentar transformar tudo em produto antes de validar o mínimo viável.',
+ fases:[
+  {n:'FASE01 — Coletar informações de VM', status:'shipped', assignee:'Nathan', due:null, sub:4, id:'86ag1p3rg'},
+  {n:'FASE02 — Conexão Prometheus / BCOS', status:'shipped', assignee:'Nathan', due:null, sub:4, id:'86ag1p51p'},
+  {n:'FASE03 — Monitoramento de VM no painel cliente (BCOS)', status:'in progress', assignee:'Nathan', due:1781679600000, sub:5, id:'86afctdgt'},
+  {n:'FASE04 — Administrativo — Saúde do Ambiente', status:'backlog', assignee:'Nathan', due:null, sub:7, id:'86afcwtz3'},
+  {n:'FASE05 — Esteira de QA', status:'backlog', assignee:'Nathan', due:null, sub:12, id:'86ag4q559'}
+ ]},
+{num:11, id:'86afcphwr', status:'in planning', due:1798700400000,
+ name:'Evolução de UX do BCP', short:'BCP — UX',
+ assignee:'Guilherme Lopes', tags:['evolução da plataforma de nuvem'],
+ detail:'Refatoração de BCOS, BC-API e Calculadora.\nObjetivo: melhorar experiência do usuário e percepção de valor da plataforma.\nEntregáveis: proposta visual revisada, tour guiado, newsletter/página de comunicação, validação do novo fluxo principal.\nCritério de aceite: fluxo principal revisado e elementos de onboarding implementados.\nRisco principal: UX perder prioridade frente às urgências técnicas.',
+ fases:[
+  {n:'FASE01 — Refatoração identidade visual', status:'backlog', assignee:'—', due:null, sub:0, id:'86afct9fr'},
+  {n:'FASE02 — Product Tour (Tour BCOS, Tooltip)', status:'backlog', assignee:'—', due:null, sub:0, id:'86afct9nj'},
+  {n:'FASE03 — Newsletter (Home do BCOS)', status:'backlog', assignee:'—', due:null, sub:0, id:'86afct9xj'},
+  {n:'FASE04 — Mapeamento das APIs do console atual', status:'backlog', assignee:'—', due:null, sub:0, id:'86ag1p795'},
+  {n:'FASE05 — Frontend consumindo APIs na nova identidade', status:'backlog', assignee:'—', due:null, sub:0, id:'86ag1p7x1'},
+  {n:'FASE06 — Identidade visual do BCP CLI', status:'backlog', assignee:'—', due:null, sub:0, id:'86ag1p8m4'},
+  {n:'FASE07 — Expor visões por API (ex. Consumo)', status:'backlog', assignee:'—', due:null, sub:0, id:'86ag1p9gh'},
+  {n:'FASE08 — Esteira QA', status:'backlog', assignee:'—', due:null, sub:10, id:'86ag5umm7'}
+ ]}
+];
+
+const criterios = {
+  'Solução de Backup em produção': ['Material técnico-comercial simples e vendável já disponível no Q1','Definição clara de RPO e RTO','Testes reais de restore executados e documentados','Garantia de que a nova arquitetura de backup esteja efetivamente em produção'],
+  'Higiene de infraestrutura': ['Nenhum ativo parado ou subutilizado ao final do Q1/2026','Auditoria integral do parque instalado: hardware comprado × instalado × operacional','Normalização completa do ambiente até o final do trimestre','Mapeamento e correção das máquinas marcadas como "disabled", com identificação de causa raiz']
+};
+
+// ---- computed metrics ----
+function metaProgress(m){
+  const w = m.fases.reduce((s,f)=>s+STATUS_WEIGHT[f.status],0);
+  return m.fases.length ? w/m.fases.length : 0;
+}
+const allFases = metas.flatMap(m=>m.fases);
+const counts = {shipped:0,'in progress':0,'in review':0,'in test':0,'in planning':0,backlog:0};
+allFases.forEach(f=>counts[f.status]++);
+const totalW = allFases.reduce((s,f)=>s+STATUS_WEIGHT[f.status],0);
+const overallPct = Math.round((totalW/allFases.length)*100);
+
+// ring
+const CIRC = 2*Math.PI*48;
+document.getElementById('ringFg').style.strokeDasharray = CIRC.toFixed(1);
+requestAnimationFrame(()=>{
+  document.getElementById('ringFg').style.strokeDashoffset = (CIRC*(1-overallPct/100)).toFixed(1);
+});
+document.getElementById('ringPct').textContent = overallPct+'%';
+document.getElementById('ringLegend').innerHTML = `
+  <div class="li"><span class="sw" style="background:var(--green)"></span><b>${counts.shipped}</b>&nbsp;concluídas</div>
+  <div class="li"><span class="sw" style="background:var(--blue)"></span><b>${counts['in progress']}</b>&nbsp;em andamento</div>
+  <div class="li"><span class="sw" style="background:var(--violet)"></span><b>${counts['in test']+counts['in review']+counts['in planning']}</b>&nbsp;em revisão/teste/planejamento</div>
+  <div class="li"><span class="sw" style="background:var(--slate)"></span><b>${counts.backlog}</b>&nbsp;não iniciadas</div>`;
+
+// kpi strip
+document.getElementById('kpiStrip').innerHTML = `
+  <div class="kpi"><div class="k-num">${metas.length}</div><div class="k-label">Metas estratégicas</div></div>
+  <div class="kpi"><div class="k-num">${allFases.length}</div><div class="k-label">Fases mapeadas</div></div>
+  <div class="kpi c-shipped"><div class="k-num">${counts.shipped}</div><div class="k-label">Concluídas</div></div>
+  <div class="kpi c-progress"><div class="k-num">${counts['in progress']}</div><div class="k-label">Em andamento</div></div>
+  <div class="kpi c-backlog"><div class="k-num">${counts.backlog}</div><div class="k-label">Não iniciadas</div></div>`;
+
+// status chips
+const chipDefs = [['all','Todas'],['shipped','Concluído'],['in progress','Em andamento'],['in test','Em teste'],['in planning','Planejamento'],['backlog','Não iniciado']];
+const chipsEl = document.getElementById('statusChips');
+let activeStatus = 'all';
+chipDefs.forEach(([key,label])=>{
+  const el = document.createElement('div');
+  el.className = 'chip'+(key==='all'?' active':'');
+  el.textContent = label;
+  el.dataset.key = key;
+  el.onclick = ()=>{ activeStatus = key; [...chipsEl.children].forEach(c=>c.classList.toggle('active', c===el)); render(); };
+  chipsEl.appendChild(el);
+});
+
+function badge(status){
+  const s = STATUS_META[status];
+  return `<span class="badge ${s.cls}">${s.label}</span>`;
+}
+
+function render(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const list = document.getElementById('metasList');
+  list.innerHTML = '';
+  metas.forEach(m=>{
+    const fasesFiltered = m.fases.filter(f=>{
+      const matchStatus = activeStatus==='all' || f.status===activeStatus;
+      const matchQ = !q || m.name.toLowerCase().includes(q) || f.n.toLowerCase().includes(q) || m.short.toLowerCase().includes(q);
+      return matchStatus && matchQ;
+    });
+    if(q && fasesFiltered.length===0 && !m.name.toLowerCase().includes(q) && !m.short.toLowerCase().includes(q)) return;
+    if(activeStatus!=='all' && fasesFiltered.length===0 && m.status!==activeStatus) return;
+
+    const pct = Math.round(metaProgress(m)*100);
+    const card = document.createElement('div');
+    card.className = 'meta-card';
+    card.innerHTML = `
+      <div class="meta-head">
+        <div class="meta-num">META<b>${String(m.num).padStart(2,'0')}</b></div>
+        <div class="meta-name">
+          <div class="n1">${m.short}</div>
+          <div class="n2">${m.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+        </div>
+        ${badge(m.status)}
+        <div class="meta-bar"><div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div><div class="bar-pct">${pct}%</div></div>
+        <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="meta-body">
+        <div class="meta-body-in">
+          <div class="fases-label">Fases (${m.fases.length}) · responsável ${m.assignee} · prazo ${fmtDate(m.due)}</div>
+          ${(fasesFiltered.length?fasesFiltered:m.fases).map((f,i)=>`
+            <div class="fase-row">
+              <div class="fase-idx">${String(i+1).padStart(2,'0')}</div>
+              <div class="fase-name">${f.n}${f.sub?`<small>+${f.sub} atividade(s) no ClickUp</small>`:''}</div>
+              <div class="fase-assignee">${f.assignee}</div>
+              ${badge(f.status)}
+              <a class="fase-link" href="https://app.clickup.com/t/${f.id}" target="_blank" title="Abrir no ClickUp">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>
+              </a>
+            </div>`).join('')}
+          <div class="meta-toggle-detail">▸ Ver ficha completa da meta</div>
+          <div class="meta-detail" style="display:none">${m.detail}</div>
+        </div>
+      </div>`;
+    const head = card.querySelector('.meta-head');
+    const body = card.querySelector('.meta-body');
+    head.addEventListener('click', ()=>{
+      const isOpen = card.classList.toggle('open');
+      body.style.maxHeight = isOpen ? body.scrollHeight+'px' : '0px';
+    });
+    const toggleDetail = card.querySelector('.meta-toggle-detail');
+    toggleDetail.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const det = card.querySelector('.meta-detail');
+      const show = det.style.display === 'none';
+      det.style.display = show ? 'block' : 'none';
+      toggleDetail.textContent = (show?'▾':'▸') + ' Ver ficha completa da meta';
+      if(card.classList.contains('open')) body.style.maxHeight = body.scrollHeight+'px';
+    });
+    list.appendChild(card);
+  });
+}
+document.getElementById('searchInput').addEventListener('input', render);
+render();
+
+// criterios
+const critGrid = document.getElementById('critGrid');
+const critColors = {'Solução de Backup em produção':'var(--blue)','Higiene de infraestrutura':'var(--red)'};
+Object.entries(criterios).forEach(([title,items])=>{
+  const card = document.createElement('div');
+  card.className = 'crit-card';
+  card.innerHTML = `<h4><span class="sw" style="background:${critColors[title]}"></span>${title}</h4>
+    <ul class="crit-list">${items.map(i=>`<li><span class="cb"></span>${i}</li>`).join('')}</ul>`;
+  critGrid.appendChild(card);
+});
+
+// footer / topbar dates
+const now = new Date();
+document.getElementById('tb-date').textContent = now.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+document.getElementById('tb-gen').textContent = 'Gerado em '+now.toLocaleString('pt-BR');
+</script>
+</body>
+</html>
