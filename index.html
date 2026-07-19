@@ -149,7 +149,8 @@
   .meta-toggle-detail:hover{color:var(--cyan);}
 
   .fases-label{font-family:var(--mono); font-size:10.5px; color:var(--text-mute); text-transform:uppercase; letter-spacing:.07em; margin:16px 0 8px;}
-  .fase-row{display:grid; grid-template-columns:26px 1fr auto 150px auto; align-items:center; gap:12px; padding:10px 12px; border-radius:10px; background:var(--bg2); border:1px solid var(--border); margin-bottom:7px;}
+  .fase-row{display:grid; grid-template-columns:26px 1fr auto 150px 16px auto; align-items:center; gap:12px; padding:10px 12px; border-radius:10px; background:var(--bg2); border:1px solid var(--border); margin-bottom:0; transition:border-color .15s;}
+  .fase-wrap{margin-bottom:7px;}
   .fase-row:hover{border-color:var(--border-hi);}
   .fase-idx{font-family:var(--mono); font-size:10px; color:var(--text-mute);}
   .fase-name{font-size:13px; color:var(--text);}
@@ -157,6 +158,15 @@
   .fase-assignee{font-family:var(--mono); font-size:11px; color:var(--text-mute); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .fase-link{color:var(--text-mute); display:flex;}
   .fase-link:hover{color:var(--cyan);}
+  .fase-row.has-ativ{cursor:pointer;}
+  .fase-row.has-ativ:hover{border-color:var(--cyan);}
+  .ativ-chev{color:var(--text-mute); transition:transform .2s; flex:none;}
+  .fase-wrap.open .ativ-chev{transform:rotate(180deg); color:var(--cyan);}
+  .ativ-list{margin:2px 0 10px 38px; padding:4px 0 4px 14px; border-left:2px solid var(--border-hi); display:flex; flex-direction:column; gap:6px;}
+  .ativ-row{display:flex; align-items:center; gap:9px; font-size:12px; color:var(--text-dim); padding:2px 0;}
+  .ativ-dot{width:7px; height:7px; border-radius:50%; flex:none;}
+  .ativ-name{flex:1; min-width:0;}
+  .ativ-status{font-family:var(--mono); font-size:10px; color:var(--text-mute); text-transform:uppercase; white-space:nowrap;}
 
   .crit-section{max-width:1180px; margin:0 auto; padding:0 28px 70px;}
   .crit-title{font-family:var(--disp); font-size:20px; font-weight:600; margin:0 0 6px;}
@@ -225,7 +235,9 @@
     .fase-name{grid-column:1/-1; order:1;}
     .fase-assignee{order:2; font-size:10.5px;}
     .fase-row .badge{order:3;}
-    .fase-link{order:4; justify-self:end;}
+    .ativ-chev{order:4;}
+    .fase-link{order:5; justify-self:end;}
+    .ativ-list{margin-left:0;}
 
     .crit-section{padding:0 16px 50px;}
     .crit-title{font-size:17px;}
@@ -309,19 +321,19 @@ const metas = [
  assignee:'Leonardo Gomes', tags:['eficiência operacional','garantia sla','sustentando o crescimento do negócio','higiene de infraestrutura'],
  detail:'Objetivo: Encerrar dependência do ambiente legado com segurança operacional, consolidando o backup em arquitetura Ceph Replica.\nEntregáveis: validação dos discos, migração das réplicas EC → Replica, validação de integridade pós-migração, plano de rollback, descomissionamento do legado.\nCritério de aceite: legado descomissionado e operação validada.\nRisco principal: atraso de insumo físico ou falha na validação pós-migração.',
  fases:[
-  {n:'FASE01 — Planejamento', status:'shipped', assignee:'Leonardo Gomes', due:1770361200000, sub:2, id:'86ag5vn7n'},
-  {n:'FASE02 — Ajustes do Ambiente', status:'shipped', assignee:'Leonardo Gomes', due:1789110000000, sub:3, id:'86ag5vnj3'},
-  {n:'FASE03 — Migração dos backups', status:'in progress', assignee:'Leonardo Gomes', due:1788937200000, sub:3, id:'86ag5vnnu'},
-  {n:'FASE04 — Descomissionamento ambiente antigo', status:'backlog', assignee:'Leonardo Gomes', due:1790751600000, sub:2, id:'86ag5vp15'}
+  {n:'FASE01 — Planejamento', status:'shipped', assignee:'Leonardo Gomes', due:1770361200000, sub:2, id:'86ag5vn7n', ativ:[{n:'Elaboração do diagnóstico técnico - Ceph',status:'shipped'},{n:'Montagem do plano de migração',status:'shipped'}]},
+  {n:'FASE02 — Ajustes do Ambiente', status:'shipped', assignee:'Leonardo Gomes', due:1789110000000, sub:3, id:'86ag5vnj3', ativ:[{n:'Garantir a chegada dos discos adquiridos em 2025',status:'shipped'},{n:'Fase 3',status:'shipped'},{n:'Fase 4',status:'shipped'}]},
+  {n:'FASE03 — Migração dos backups', status:'in progress', assignee:'Leonardo Gomes', due:1788937200000, sub:3, id:'86ag5vnnu', ativ:[{n:'Migrar do EC para replicated com controle',status:'in progress'},{n:'Remoção do node 05',status:'shipped'},{n:'Migrar para o cluster novo e mover storages conforme esvaziamos',status:'in progress'}]},
+  {n:'FASE04 — Descomissionamento ambiente antigo', status:'backlog', assignee:'Leonardo Gomes', due:1790751600000, sub:2, id:'86ag5vp15', ativ:[{n:'Remoção dos últimos nodes do cluster',status:'backlog'},{n:'Adição dos nodes no novo cluster',status:'backlog'}]}
  ]},
 {num:2, id:'86afcpfhb', status:'in progress', due:1782802800000,
  name:'Migração Cloud 2 para Cloud 3', short:'Migração 2.0 > 3.0',
  assignee:'Leonardo Gomes', tags:['eficiência operacional','sustentando o crescimento do negócio','modernização tecnológica','higiene de infraestrutura'],
  detail:'Meta: ≤100 VMs na Cloud 2.0.\nObjetivo: Transferir workloads e infraestrutura para a nova cloud com previsibilidade e segurança.\nEntregáveis: cronograma consolidado, migração dos nós físicos, migração dos IPs, migração das VMs, validação final.\nCritério de aceite: migração concluída com validação operacional.\nRisco principal: responsabilidade compartilhada sem dono executivo claro.',
  fases:[
-  {n:'FASE01 — Quantidade de VMs cloud 2.0 (evolução)', status:'shipped', assignee:'Leonardo Gomes', due:1782802800000, sub:5, id:'86afcx00k'},
-  {n:'FASE02 — Migração de Nodes', status:'in progress', assignee:'Leonardo Gomes', due:1798700400000, sub:34, id:'86afzddfh'},
-  {n:'FASE03 — Migração de Bloco de IPs', status:'backlog', assignee:'Leonardo Gomes', due:1798700400000, sub:5, id:'86afzde05'}
+  {n:'FASE01 — Quantidade de VMs cloud 2.0 (evolução)', status:'shipped', assignee:'Leonardo Gomes', due:1782802800000, sub:5, id:'86afcx00k', ativ:[{n:'Medir quantidade de VMs restantes na 2.0 — Fev',status:'shipped'},{n:'Medir quantidade de VMs restantes na 2.0 — Mar',status:'shipped'},{n:'Medir quantidade de VMs restantes na 2.0 — Abr',status:'shipped'},{n:'Medir quantidade de VMs restantes na 2.0 — Mai',status:'shipped'},{n:'Medir quantidade de VMs restantes na 2.0 — Jun',status:'shipped'}]},
+  {n:'FASE02 — Migração de Nodes', status:'in progress', assignee:'Leonardo Gomes', due:1798700400000, sub:34, id:'86afzddfh', ativ:[{n:'br-sp-02-node01',status:'backlog'},{n:'br-sp-02-node02',status:'shipped'},{n:'br-sp-02-node03',status:'shipped'},{n:'br-sp-02-node04',status:'in progress'},{n:'br-sp-02-node05',status:'in planning'},{n:'br-sp-02-node06',status:'backlog'},{n:'br-sp-02-node07',status:'in planning'},{n:'br-sp-02-node08',status:'backlog'},{n:'br-sp-02-node09',status:'shipped'},{n:'br-sp-02-node10',status:'backlog'},{n:'br-sp-02-node15',status:'backlog'},{n:'br-sp-02-node16',status:'shipped'},{n:'br-sp-02-node17',status:'in planning'},{n:'br-sp-02-node18',status:'backlog'},{n:'br-sp-02-node19',status:'backlog'},{n:'br-sp-02-node20',status:'backlog'},{n:'br-sp-02-node21',status:'backlog'},{n:'br-sp-02-node22',status:'shipped'},{n:'br-sp-02-node23',status:'shipped'},{n:'srv-win-01',status:'shipped'},{n:'srv-win-02',status:'shipped'},{n:'srv-win-03',status:'backlog'},{n:'srv-win-04',status:'backlog'},{n:'srv-win-05',status:'in progress'},{n:'srv-win-06',status:'shipped'},{n:'srv-win-07',status:'backlog'},{n:'srv-win-08',status:'backlog'},{n:'srv-dentaluni-01',status:'shipped'},{n:'srv-oracle-gimba-01',status:'shipped'},{n:'srv-oracle-gimba-02',status:'shipped'},{n:'srv-oracle-gimba-03',status:'shipped'},{n:'srv-oracle-gimba-04',status:'shipped'},{n:'srv-oraclenode-01',status:'backlog'},{n:'srv-oraclenode-02',status:'backlog'}]},
+  {n:'FASE03 — Migração de Bloco de IPs', status:'backlog', assignee:'Leonardo Gomes', due:1798700400000, sub:5, id:'86afzde05', ativ:[{n:'45.225.25.0/24',status:'backlog'},{n:'45.225.26.0/24',status:'backlog'},{n:'45.225.27.0/24',status:'backlog'},{n:'200.218.224.0/24',status:'backlog'},{n:'200.218.225.0/24',status:'backlog'}]}
  ]}
 ];
 
@@ -409,14 +421,20 @@ function render(){
         <div class="meta-body-in">
           <div class="fases-label">Fases (${m.fases.length}) · responsável ${m.assignee} · prazo ${fmtDate(m.due)}</div>
           ${(fasesFiltered.length?fasesFiltered:m.fases).map((f,i)=>`
-            <div class="fase-row">
-              <div class="fase-idx">${String(i+1).padStart(2,'0')}</div>
-              <div class="fase-name">${f.n}${f.sub?`<small>+${f.sub} atividade(s) no ClickUp</small>`:''}</div>
-              <div class="fase-assignee">${f.assignee}</div>
-              ${badge(f.status)}
-              <a class="fase-link" href="https://app.clickup.com/t/${f.id}" target="_blank" title="Abrir no ClickUp">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>
-              </a>
+            <div class="fase-wrap">
+              <div class="fase-row${f.ativ?' has-ativ':''}">
+                <div class="fase-idx">${String(i+1).padStart(2,'0')}</div>
+                <div class="fase-name">${f.n}${f.ativ?`<small>${f.ativ.length} atividade(s) — toque para ver</small>`:(f.sub?`<small>+${f.sub} atividade(s) no ClickUp</small>`:'')}</div>
+                <div class="fase-assignee">${f.assignee}</div>
+                ${badge(f.status)}
+                ${f.ativ?'<svg class="ativ-chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>':'<span></span>'}
+                <a class="fase-link" href="https://app.clickup.com/t/${f.id}" target="_blank" title="Abrir no ClickUp">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>
+                </a>
+              </div>
+              ${f.ativ?`<div class="ativ-list" style="display:none">
+                ${f.ativ.map(a=>`<div class="ativ-row"><span class="ativ-dot" style="background:${STATUS_META[a.status].color}"></span><span class="ativ-name">${a.n}</span><span class="ativ-status">${STATUS_META[a.status].label}</span></div>`).join('')}
+              </div>`:''}
             </div>`).join('')}
           <div class="meta-toggle-detail">▸ Ver ficha completa da meta</div>
           <div class="meta-detail" style="display:none">${m.detail}</div>
@@ -436,6 +454,17 @@ function render(){
       det.style.display = show ? 'block' : 'none';
       toggleDetail.textContent = (show?'▾':'▸') + ' Ver ficha completa da meta';
       if(card.classList.contains('open')) body.style.maxHeight = body.scrollHeight+'px';
+    });
+    card.querySelectorAll('.fase-row.has-ativ').forEach(row=>{
+      row.addEventListener('click', (e)=>{
+        if(e.target.closest('.fase-link')) return;
+        const wrap = row.closest('.fase-wrap');
+        const al = wrap.querySelector('.ativ-list');
+        const show = al.style.display === 'none';
+        al.style.display = show ? 'flex' : 'none';
+        wrap.classList.toggle('open', show);
+        if(card.classList.contains('open')) body.style.maxHeight = body.scrollHeight+'px';
+      });
     });
     list.appendChild(card);
   });
