@@ -473,7 +473,14 @@ function render(){
         if(card.classList.contains('open')) body.style.maxHeight = body.scrollHeight+'px';
       });
     });
+    // Abrir tudo por padrão: card da meta + todas as fases/atividades visíveis, nada oculto
+    card.querySelectorAll('.ativ-list').forEach(al=>{
+      al.style.display = 'flex';
+      al.closest('.fase-wrap').classList.add('open');
+    });
     list.appendChild(card);
+    card.classList.add('open');
+    body.style.maxHeight = 'none';
   });
 }
 document.getElementById('searchInput').addEventListener('input', render);
