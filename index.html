@@ -136,6 +136,9 @@
 
   .chev{color:var(--text-mute); transition:transform .2s;}
   .meta-card.open .chev{transform:rotate(180deg);}
+  .meta-card.meta-link .chev.ext-link{color:var(--cyan); transform:none !important;}
+  .meta-card.meta-link:hover .chev.ext-link{color:var(--text);}
+  .meta-card.meta-link:hover{border-color:var(--cyan);}
 
   .meta-body{max-height:0; overflow:hidden; transition:max-height .3s ease;}
   .meta-body-in{padding:0 18px 20px; border-top:1px solid var(--border);}
@@ -513,6 +516,12 @@ function badge(status){
   return `<span class="badge ${s.cls}">${s.label}</span>`;
 }
 
+// Teste: estas metas abrem uma página própria ao clicar, em vez de expandir o detalhe aqui
+const PAGE_MAP = {
+  4: 'meta-04-migracao-ceph.html',
+  5: 'meta-05-migracao-2-0-3-0.html'
+};
+
 function render(){
   const q = document.getElementById('searchInput').value.trim().toLowerCase();
   const list = document.getElementById('metasList');
@@ -527,8 +536,9 @@ function render(){
     if(activeStatus!=='all' && fasesFiltered.length===0 && m.status!==activeStatus) return;
 
     const pct = Math.round(metaProgress(m)*100);
+    const linkPage = PAGE_MAP[m.num];
     const card = document.createElement('div');
-    card.className = 'meta-card';
+    card.className = 'meta-card' + (linkPage ? ' meta-link' : '');
     card.innerHTML = `
       <div class="meta-head">
         <div class="meta-num">META<b>${String(m.num).padStart(2,'0')}</b></div>
@@ -538,9 +548,11 @@ function render(){
         </div>
         ${badge(m.status)}
         <div class="meta-bar"><div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div><div class="bar-pct">${pct}%</div></div>
-        <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        ${linkPage
+          ? '<svg class="chev ext-link" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>'
+          : '<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>'}
       </div>
-      <div class="meta-body">
+      ${linkPage ? '' : `<div class="meta-body">
         <div class="meta-body-in">
           <div class="fases-label">Fases (${m.fases.length}) · responsável ${m.assignee} · prazo ${fmtDate(m.due)}</div>
           ${(fasesFiltered.length?fasesFiltered:m.fases).map((f,i)=>`
@@ -562,9 +574,16 @@ function render(){
           <div class="meta-toggle-detail">▸ Ver ficha completa da meta</div>
           <div class="meta-detail" style="display:none">${m.detail}</div>
         </div>
-      </div>`;
+      </div>`}`;
     const head = card.querySelector('.meta-head');
     const body = card.querySelector('.meta-body');
+    if(linkPage){
+      head.style.cursor = 'pointer';
+      head.title = 'Abrir painel da meta';
+      head.addEventListener('click', ()=>{ window.location.href = linkPage; });
+      list.appendChild(card);
+      return;
+    }
     head.addEventListener('click', ()=>{
       const isOpen = card.classList.toggle('open');
       body.style.maxHeight = isOpen ? body.scrollHeight+'px' : '0px';
