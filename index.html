@@ -516,10 +516,19 @@ function badge(status){
   return `<span class="badge ${s.cls}">${s.label}</span>`;
 }
 
-// Teste: estas metas abrem uma página própria ao clicar, em vez de expandir o detalhe aqui
+// Cada meta abre sua propria pagina ao clicar
 const PAGE_MAP = {
+  1: 'meta-01-disponibilidade-ambiente-nuvem.html',
+  2: 'meta-02-observabilidade-de-bcloud-3-0.html',
+  3: 'meta-03-claudia-no-suporte.html',
   4: 'meta-04-migracao-ceph.html',
-  5: 'meta-05-migracao-2-0-3-0.html'
+  5: 'meta-05-migracao-2-0-3-0.html',
+  6: 'meta-06-nova-solucao-de-backup-bc-backup.html',
+  7: 'meta-07-bc-box-automacao-de-instalacao-do-bcp.html',
+  8: 'meta-08-bcp-seguranca.html',
+  9: 'meta-09-bcp-modulo-financeiro.html',
+  10: 'meta-10-bcp-modulo-observabilidade.html',
+  11: 'meta-11-bcp-ux.html'
 };
 
 function render(){
