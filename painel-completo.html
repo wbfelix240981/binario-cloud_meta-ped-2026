@@ -17,6 +17,7 @@
     --blue:#4cc3fb; --blue-dim:#10324a;
     --amber:#ffc65c; --amber-dim:#3a2907;
     --violet:#b79bfb; --violet-dim:#2a2148;
+    --orange:#ff9052; --orange-dim:#3a2110;
     --slate:#8695a8; --slate-dim:#212c3b;
     --red:#ff8585;
     --mono:'JetBrains Mono',monospace; --disp:'Space Grotesk',sans-serif; --body:'Inter',sans-serif;
@@ -123,7 +124,8 @@
   .badge{font-family:var(--mono); font-size:10.5px; font-weight:600; padding:5px 10px; border-radius:7px; white-space:nowrap; text-transform:uppercase; letter-spacing:.02em; text-align:center;}
   .b-shipped{color:var(--green); background:var(--green-dim); border:1px solid #14523f;}
   .b-progress{color:var(--blue); background:var(--blue-dim); border:1px solid #0f4560;}
-  .b-review, .b-test{color:var(--violet); background:var(--violet-dim); border:1px solid #3d2f66;}
+  .b-review{color:var(--orange); background:var(--orange-dim); border:1px solid #5c3419;}
+  .b-test{color:var(--violet); background:var(--violet-dim); border:1px solid #3d2f66;}
   .b-planning{color:var(--amber); background:var(--amber-dim); border:1px solid #5c4110;}
   .b-backlog{color:var(--slate); background:var(--slate-dim); border:1px solid #2a3444;}
 
@@ -324,15 +326,16 @@
 </footer>
 
 <script>
+// Ordem e nomes oficiais da lista "Meta P&D 2026" no ClickUp: backlog, in planning, in progress, in test, in review, shipped
 const STATUS_META = {
-  'shipped':   {label:'Concluído',   cls:'b-shipped',  color:'var(--green)'},
-  'in progress':{label:'Em andamento',cls:'b-progress', color:'var(--blue)'},
-  'in review': {label:'Em revisão',  cls:'b-review',   color:'var(--violet)'},
-  'in test':   {label:'Em teste',    cls:'b-test',     color:'var(--violet)'},
-  'in planning':{label:'Planejamento',cls:'b-planning', color:'var(--amber)'},
-  'backlog':   {label:'Não iniciado',cls:'b-backlog',  color:'var(--slate)'}
+  'backlog':    {label:'Não iniciado', cls:'b-backlog',  color:'var(--slate)'},
+  'in planning':{label:'Planejamento', cls:'b-planning', color:'var(--amber)'},
+  'in progress':{label:'Em andamento', cls:'b-progress', color:'var(--blue)'},
+  'in test':    {label:'Em teste',     cls:'b-test',     color:'var(--violet)'},
+  'in review':  {label:'Em revisão',   cls:'b-review',   color:'var(--orange)'},
+  'shipped':    {label:'Concluído',    cls:'b-shipped',  color:'var(--green)'}
 };
-const STATUS_WEIGHT = {'shipped':1,'in progress':.5,'in review':.5,'in test':.5,'in planning':.5,'backlog':0};
+const STATUS_WEIGHT = {'backlog':0,'in planning':.5,'in progress':.5,'in test':.5,'in review':.5,'shipped':1};
 
 function fmtDate(ms){
   if(!ms) return '—';
@@ -486,7 +489,9 @@ document.getElementById('ringPct').textContent = overallPct+'%';
 document.getElementById('ringLegend').innerHTML = `
   <div class="li"><span class="sw" style="background:var(--green)"></span><b>${counts.shipped}</b>&nbsp;concluídas</div>
   <div class="li"><span class="sw" style="background:var(--blue)"></span><b>${counts['in progress']}</b>&nbsp;em andamento</div>
-  <div class="li"><span class="sw" style="background:var(--violet)"></span><b>${counts['in test']+counts['in review']+counts['in planning']}</b>&nbsp;em revisão/teste/planejamento</div>
+  <div class="li"><span class="sw" style="background:var(--violet)"></span><b>${counts['in test']}</b>&nbsp;em teste</div>
+  <div class="li"><span class="sw" style="background:var(--orange)"></span><b>${counts['in review']}</b>&nbsp;em revisão</div>
+  <div class="li"><span class="sw" style="background:var(--amber)"></span><b>${counts['in planning']}</b>&nbsp;planejamento</div>
   <div class="li"><span class="sw" style="background:var(--slate)"></span><b>${counts.backlog}</b>&nbsp;não iniciadas</div>`;
 
 // kpi strip
@@ -498,7 +503,7 @@ document.getElementById('kpiStrip').innerHTML = `
   <div class="kpi c-backlog"><div class="k-num">${counts.backlog}</div><div class="k-label">Não iniciadas</div></div>`;
 
 // status chips
-const chipDefs = [['all','Todas'],['shipped','Concluído'],['in progress','Em andamento'],['in test','Em teste'],['in planning','Planejamento'],['backlog','Não iniciado']];
+const chipDefs = [['all','Todas'],['backlog','Não iniciado'],['in planning','Planejamento'],['in progress','Em andamento'],['in test','Em teste'],['in review','Em revisão'],['shipped','Concluído']];
 const chipsEl = document.getElementById('statusChips');
 let activeStatus = 'all';
 chipDefs.forEach(([key,label])=>{
