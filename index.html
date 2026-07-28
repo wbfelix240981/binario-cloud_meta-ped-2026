@@ -287,7 +287,7 @@
   <div class="hero-grid">
     <div>
       <h1 class="hero-title">Metas de Pesquisa &<br><span>Desenvolvimento</span> 2026</h1>
-      <p class="hero-sub">Visão consolidada das 7 metas estratégicas do time de Engenharia/Plataforma da Binário Cloud — com atividades, datas de conclusão e alerta automático de atrasos — extraído diretamente da lista <b style="color:var(--text)">Meta P&D 2026</b> no ClickUp. Metas também presentes na lista "Metas 2026" do Rafael Alves (Disponibilidade Ambiente, Migração Ceph, Desmobilização 2.0&gt;3.0 e BC Box) foram desconsideradas deste painel.</p>
+      <p class="hero-sub">Visão consolidada das 5 metas estratégicas do time de Engenharia/Plataforma da Binário Cloud — com atividades, datas de conclusão e alerta automático de atrasos — extraído diretamente da lista <b style="color:var(--text)">Meta P&D 2026</b> no ClickUp. Metas também presentes na lista "Metas 2026" do Rafael Alves, além de Observabilidade BCloud 3.0 e ClaudIA no Suporte, foram desconsideradas deste painel.</p>
     </div>
     <div class="ring-card">
       <div class="ring-wrap">
@@ -344,23 +344,6 @@ function fmtDate(ms){
 }
 
 const metas = [
-{num:2, id:"86afcpf3x", status:"in progress", due:1786690800000,
- name:"Observabilidade da nuvem e undercloud", short:"Observabilidade de BCloud 3.0",
- assignee:"Luiz Fernando Justino Silva", tags:["eficiência operacional","garantia sla"],
- detail:"Objetivo: Aumentar capacidade de diagnóstico, prevenção e análise da plataforma.\nResponsável: Coordenador de SRE e Confiabilidade\nEntregáveis: arquitetura Prometheus/Grafana implantada, dashboards técnicos e executivos, alertas críticos configurados, plano de evolução para undercloud.\nCritério de aceite: dashboards e alertas operando em produção com documentação mínima.\nRisco principal: escopo amplo demais sem priorização inicial.",
- fases:[
-  {n:"FASE01 — Arquitetura do Prometheus", status:"shipped", assignee:"Luiz Fernando", due:null, id:"86ag1n72m", ativ:[{n:"Levantamento e definição",status:"shipped",due:null},{n:"Desenho da arquitetura",status:"shipped",due:null},{n:"configuração do Prometheus",status:"shipped",due:null},{n:"Documentação de configuração",status:"shipped",due:null}]},
-  {n:"FASE02 — Arquitetura do Grafana", status:"shipped", assignee:"Luiz Fernando", due:null, id:"86ag1n78c", ativ:[{n:"Levantamento e definição",status:"shipped",due:null},{n:"Configuração do Grafana",status:"shipped",due:null}]},
-  {n:"FASE03 — Plano de backup da VM", status:"in progress", assignee:"Luiz Fernando", due:1786690800000, id:"86ag1n7f6", ativ:[{n:"Definir politica de backup do ambiente de observabilidade",status:"in progress",due:1786690800000}]}
- ]},
-{num:3, id:"86afcpfq1", status:"in planning", due:1785481200000,
- name:"Automação do atendimento Cláudia (N1)", short:"ClaudIA no Suporte",
- assignee:"Guilherme Lopes", tags:["modernização tecnológica","eficiência operacional"],
- detail:"Objetivo: Garantir 80% dos chamados N1 tratados via ClaudIA, reduzindo carga manual de atendimento até julho.\nEntregáveis: fluxo principal automatizado, base de conhecimento conectada, homologação funcional, relatório de impacto operacional.\nCritério de aceite: solução em uso com resultado mensurável de eficiência.\nRisco principal: baixa qualidade da base de conhecimento ou escopo difuso.",
- fases:[
-  {n:"FASE01 — Trigger de criação de chamado no znuny", status:"backlog", assignee:"—", due:null, id:"86ag1ncz9", ativ:[]},
-  {n:"FASE02 — API de integração entre znuny e ClaudIA", status:"backlog", assignee:"—", due:null, id:"86ag1ndmu", ativ:[]}
- ]},
 {num:6, id:"86afcpha5", status:"in progress", due:1780210800000,
  name:"Validação e entrada da solução de backup (BC-Backup) em produção", short:"Nova solução de Backup — BC-Backup",
  assignee:"Nathan de Moraes Valim Francisco", tags:["evolução da plataforma de nuvem","modernização tecnológica"],
@@ -489,8 +472,6 @@ function badge(status){
 
 // Cada meta abre sua propria pagina ao clicar
 const PAGE_MAP = {
-  2: 'meta-02-observabilidade-de-bcloud-3-0.html',
-  3: 'meta-03-claudia-no-suporte.html',
   6: 'meta-06-nova-solucao-de-backup-bc-backup.html',
   8: 'meta-08-bcp-seguranca.html',
   9: 'meta-09-bcp-modulo-financeiro.html',
