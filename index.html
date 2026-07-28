@@ -335,7 +335,7 @@ const STATUS_META = {
   'in review':  {label:'Em revisão',   cls:'b-review',   color:'var(--orange)'},
   'shipped':    {label:'Concluído',    cls:'b-shipped',  color:'var(--green)'}
 };
-const STATUS_WEIGHT = {'backlog':0,'in planning':.5,'in progress':.5,'in test':.5,'in review':.5,'shipped':1};
+const STATUS_WEIGHT = {'backlog':0,'in planning':0,'in progress':0,'in test':0,'in review':0,'shipped':1};
 
 function fmtDate(ms){
   if(!ms) return '—';
